@@ -1,0 +1,17 @@
+{
+  "name": "termilog",
+  "version": "1.0.0",
+  "description": "Universal terminal logger for Node and frontend frameworks",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./bridge": "./server/bridge.js"
+  },
+  "keywords": ["logger", "terminal", "react", "node", "debugging"],
+  "author": "Nischal Dhakal",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
