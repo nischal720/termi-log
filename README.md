@@ -1,105 +1,138 @@
-#  Termilog
+# 🖥️ Termilog
 
-**Universal terminal logger for Node.js and frontend frameworks**
+Universal terminal logger for Node.js and frontend frameworks
 
-Termilog lets you send logs from **Node.js, React, Vue, Next.js, or any JavaScript app** directly to your **terminal** — without opening browser DevTools.
+Termilog lets you send logs from Node.js, React, Vue, Next.js, or any JavaScript app directly to your terminal — without opening browser DevTools.
 
----
+------------------------------------------------------------
 
-## Features
+FEATURES
 
-- Logs appear in your **terminal**, not browser console
-- Works with **Node.js, React, Vue, Next.js, etc.**
-- Multiple adapters: Terminal, Browser, File
-- Configurable log levels
-- Production ready
-- Easy to extend
+    • Logs appear in your terminal, not the browser console  
+    • Works with Node.js, React, Vue, Next.js, and more  
+    • Multiple adapters: Terminal, Browser, File  
+    • Configurable log levels  
+    • Production ready & lightweight  
+    • Easy to extend  
 
----
+------------------------------------------------------------
 
-## Installation
-npm install termilog
+INSTALLATION
 
-## Basic Usage (Node.js)
-import { Logger, nodeAdapter } from "termilog";
+    npm install termilog-js
 
-const log = new Logger(nodeAdapter);
+------------------------------------------------------------
 
-log.info("Server started");
-log.warn("Low memory");
-log.error("Something went wrong");
+BASIC USAGE (Node.js)
 
-## Use with React / Frontend Frameworks
-Because browsers can't access your terminal, Termilog uses a lightweight bridge server.
- 1. Start the bridge server
-   Create file: log-server.js 
-     import { startBridge } from "termilog/bridge";
-     startBridge(5000);
-   Run it:
-     bash
+    import { Logger, nodeAdapter } from "termilog-js";
+
+    const log = new Logger(nodeAdapter);
+
+    log.info("Server started");
+    log.warn("Low memory");
+    log.error("Something went wrong");
+
+------------------------------------------------------------
+
+USING WITH REACT / FRONTEND FRAMEWORKS
+
+Browsers cannot access your terminal directly.  
+Termilog solves this using a lightweight logging bridge server.
+
+    STEP 1 — Start the bridge server
+
+    Create file: log-server.js
+
+      import { startBridge } from "termilog-js/bridge";
+      startBridge(5000);
+
+    Run it:
+
      node log-server.js
 
- 2. Use in your React app
-     import { Logger, createBrowserAdapter } from "termilog";
+Keep this terminal open.
+
+STEP 2 — Use Termilog in your React app
+
+     import { Logger, createBrowserAdapter } from "termilog-js";
 
      const log = new Logger(createBrowserAdapter());
 
      log.info("React app started");
-      log.warn("Button clicked");
-Your logs will now appear in the terminal running the bridge server.
+     log.warn("Button clicked");
 
-## File Logging
-     import { Logger, createFileAdapter } from "termilog";
+Your logs will now appear in the terminal running log-server.js.
+
+------------------------------------------------------------
+
+FILE LOGGING
+
+     import { Logger, createFileAdapter } from "termilog-js";
 
      const log = new Logger(createFileAdapter("app.log"));
 
      log.info("Saved to file");
 
-## Multiple Adapters at Once
-     import { Logger, nodeAdapter, createFileAdapter } from "termilog";
+------------------------------------------------------------
 
-     const log = new Logger([
-        nodeAdapter,
-        createFileAdapter("server.log")
+MULTIPLE ADAPTERS AT ONCE
+
+    import { Logger, nodeAdapter, createFileAdapter } from "termilog-js";
+
+    const log = new Logger([
+       nodeAdapter,
+     createFileAdapter("server.log")
      ]);
 
      log.error("Critical failure");
 
-##  Log Levels
-    const log = new Logger(nodeAdapter, { level: "warn" });
+------------------------------------------------------------
 
-    log.debug("Ignored");
-    log.info("Ignored");
-    log.warn("Shown");
-    log.error("Shown");
-   Levels: debug → info → warn → error
+LOG LEVELS
 
-##  Custom Adapter
-     const myAdapter = {
-     write(entry) {
-    // Send logs anywhere: DB, API, cloud, etc.
+     const log = new Logger(nodeAdapter, { level: "warn" });
+
+     log.debug("Ignored");
+     log.info("Ignored");
+     log.warn("Shown");
+     log.error("Shown");
+
+Log level order:
+    debug → info → warn → error
+
+------------------------------------------------------------
+
+CUSTOM ADAPTER
+
+    const myAdapter = {
+      write(entry) {
       console.log("CUSTOM:", entry);
-     }
+      }
      };
 
      const log = new Logger(myAdapter);
 
-## Example Output
-      [INFO] 2025-12-24T10:15:30Z → Server started
-      [WARN] 2025-12-24T10:15:33Z → Low memory
-      [ERROR] 2025-12-24T10:15:40Z → Database connection failed
-    
-## Why Termilog?
-    Developers waste time opening DevTools.
+------------------------------------------------------------
+
+EXAMPLE OUTPUT
+
+     [INFO]  2025-12-24T10:15:30Z → Server started  
+     [WARN]  2025-12-24T10:15:33Z → Low memory  
+     [ERROR] 2025-12-24T10:15:40Z → Database connection failed  
+
+------------------------------------------------------------
+
+WHY TERMILOG?
+
+    Developers waste time opening DevTools.  
     Termilog puts your logs where they belong — in your terminal.
 
+------------------------------------------------------------
 
+LICENSE
 
+MIT
 
-
-
-
-     
-
-
-
+Nischal Dhakal
+ 
