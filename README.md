@@ -1,138 +1,172 @@
 # 🖥️ Termilog
 
-Universal terminal logger for Node.js and frontend frameworks
+> **Universal terminal logger for Node.js, React, Vue, Next.js, and modern JavaScript applications.**
 
-Termilog lets you send logs from Node.js, React, Vue, Next.js, or any JavaScript app directly to your terminal — without opening browser DevTools.
+[![npm version](https://img.shields.io/npm/v/termilog-js?style=flat-square)](https://www.npmjs.com/package/termilog-js)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
-------------------------------------------------------------
+**Termilog** bridges the gap between your browser and your terminal. It allows you to pipe console logs from your frontend application directly to your terminal window, keeping your debugging flow in one place without constant context switching to browser DevTools.
 
-FEATURES
+Now features a built-in **Development CLI** with auto-restart capabilities (process watcher), making it a perfect lightweight alternative to `nodemon` for your development scripts.
 
-    • Logs appear in your terminal, not the browser console  
-    • Works with Node.js, React, Vue, Next.js, and more  
-    • Multiple adapters: Terminal, Browser, File  
-    • Configurable log levels  
-    • Production ready & lightweight  
-    • Easy to extend  
+---
 
-------------------------------------------------------------
+## ✨ Features
 
-INSTALLATION
+- **Universal Logging**: Unified logging interface for both Backend (Node.js) and Frontend (Browser).
+- **Log Bridging**: Stream browser logs instantly to your local terminal.
+- **⚡ Zero-Config CLI**: New `termilog` command to run and watch your scripts (Hot Reload).
+- **Flexible Adapters**: Built-in support for Console, File, and Bridge adapters.
+- **Lightweight**: Minimal dependencies, focused on performance.
 
-    npm install termilog-js
+---
 
-------------------------------------------------------------
+## 🚀 Installation
 
-BASIC USAGE (Node.js)
+```bash
+npm install termilog-js
+# or globally for the CLI
+npm install -g termilog-js
+```
 
-    import { Logger, nodeAdapter } from "termilog-js";
+---
 
-    const log = new Logger(nodeAdapter);
+## 🛠️ CLI Usage (New!)
 
-    log.info("Server started");
-    log.warn("Low memory");
-    log.error("Something went wrong");
+Termilog now comes with a development runner that creates a seamless logging environment. It watches your files for changes and automatically restarts your script, just like `nodemon`.
 
-------------------------------------------------------------
+### Running a script
+```bash
+npx termilog src/server.js
+```
 
-USING WITH REACT / FRONTEND FRAMEWORKS
+### Watching a different file
+```bash
+npx termilog app.js
+```
 
-Browsers cannot access your terminal directly.  
-Termilog solves this using a lightweight logging bridge server.
+The CLI automatically:
+1.  **Starts the Bridge Server** (Port 5000) for browser logs.
+2.  **Watches files** and restarts your script on change.
+3.  **Cleanups processes** on exit.
 
-    STEP 1 — Start the bridge server
+---
 
-    Create file: log-server.js
+## 📖 Library Usage
 
-      import { startBridge } from "termilog-js/bridge";
-      startBridge(5000);
+### 1. Node.js Environment
 
-    Run it:
+Use the default Node adapter for standard terminal output.
 
-     node log-server.js
+```javascript
+import { Logger, nodeAdapter } from "termilog-js";
 
-Keep this terminal open.
+const log = new Logger(nodeAdapter);
 
-STEP 2 — Use Termilog in your React app
+log.info("Server initialized on port 3000");
+log.warn("Memory usage high");
+log.error("Database connection failed");
+```
 
-     import { Logger, createBrowserAdapter } from "termilog-js";
+### 2. Frontend Frameworks (React, Vue, Next.js)
 
-     const log = new Logger(createBrowserAdapter());
+To see browser logs in your terminal, you need to use the **Bridge Adapter**.
 
-     log.info("React app started");
-     log.warn("Button clicked");
+**Step A: Start the Bridge Server**
+- **Option 1 (Recommended):** Just run `npx termilog` (or `npx termilog dev.js`) in your terminal. It starts the bridge server automatically!
+- **Option 2 (Manual):** If you are not using the CLI, start it in your own script:
 
-Your logs will now appear in the terminal running log-server.js.
+```javascript
+// scripts/dev-server.js
+import { startBridge } from "termilog-js/bridge";
 
-------------------------------------------------------------
+// Starts the log receiver on port 5000
+startBridge(5000); 
+```
 
-FILE LOGGING
+**Step B: Configure the Logger in your App**
 
-     import { Logger, createFileAdapter } from "termilog-js";
+```javascript
+// src/utils/logger.js
+import { Logger, createBrowserAdapter } from "termilog-js";
 
-     const log = new Logger(createFileAdapter("app.log"));
+// Connects to the bridge server running on localhost:5000
+const log = new Logger(createBrowserAdapter({ port: 5000 }));
 
-     log.info("Saved to file");
+export default log;
+```
 
-------------------------------------------------------------
+**Step C: Log from your Component**
 
-MULTIPLE ADAPTERS AT ONCE
+```javascript
+import log from './utils/logger';
 
-    import { Logger, nodeAdapter, createFileAdapter } from "termilog-js";
+function App() {
+  const handleClick = () => {
+    log.info("Button clicked in browser!"); // This appears in your TERMINAL!
+  };
+  return <button onClick={handleClick}>Click Me</button>;
+}
+```
 
-    const log = new Logger([
-       nodeAdapter,
-     createFileAdapter("server.log")
-     ]);
+### 3. Remote Logging (Standalone / Universal Mode)
 
-     log.error("Critical failure");
+Termilog can act as a **central log server**. You can run `npx termilog` in one terminal, and have multiple apps (Frontend OR Backend) pipe logs to it.
 
-------------------------------------------------------------
+**Terminal 1 (Listener)**
+```bash
+npx termilog
+# Starts bridge server on port 5000 and waits for logs...
+```
 
-LOG LEVELS
+**Terminal 2 (Node.js App)**
+Instead of `nodeAdapter`, use `createRemoteAdapter` to send logs to the listener.
 
-     const log = new Logger(nodeAdapter, { level: "warn" });
+```javascript
+import { Logger, createRemoteAdapter } from "termilog-js";
 
-     log.debug("Ignored");
-     log.info("Ignored");
-     log.warn("Shown");
-     log.error("Shown");
+// Connects to localhost:5000 (default)
+const log = new Logger(createRemoteAdapter());
 
-Log level order:
-    debug → info → warn → error
+log.info("This log is sent over the network to Terminal 1!");
+```
 
-------------------------------------------------------------
+**Terminal 3 (React App)**
+Same as standard frontend usage: `createBrowserAdapter()` connects to the same listener automatically.
 
-CUSTOM ADAPTER
+---
 
-    const myAdapter = {
-      write(entry) {
-      console.log("CUSTOM:", entry);
-      }
-     };
+## 📂 File Logging
 
-     const log = new Logger(myAdapter);
+Need to persist logs? Use the File Adapter.
 
-------------------------------------------------------------
+```javascript
+import { Logger, createFileAdapter } from "termilog-js";
 
-EXAMPLE OUTPUT
+const fileLog = new Logger(createFileAdapter("application.log"));
 
-     [INFO]  2025-12-24T10:15:30Z → Server started  
-     [WARN]  2025-12-24T10:15:33Z → Low memory  
-     [ERROR] 2025-12-24T10:15:40Z → Database connection failed  
+fileLog.info("This line is written to application.log");
+```
 
-------------------------------------------------------------
+---
 
-WHY TERMILOG?
+## 🧩 Advanced: Multiple Adapters
 
-    Developers waste time opening DevTools.  
-    Termilog puts your logs where they belong — in your terminal.
+You can combine adapters to pipe logs to multiple destinations simultaneously (e.g., Terminal + File).
 
-------------------------------------------------------------
+```javascript
+import { Logger, nodeAdapter, createFileAdapter } from "termilog-js";
 
-LICENSE
+const log = new Logger([
+  nodeAdapter,
+  createFileAdapter("debug.log")
+]);
 
-MIT
+log.error("This goes to stdout AND debug.log");
+```
 
-Nischal Dhakal
- 
+---
+
+## 📄 License
+
+MIT © [Nischal Dhakal](https://github.com/nischal720)
