@@ -36,17 +36,28 @@ npm install -g termilog-js
 Termilog now comes with a development runner that creates a seamless logging environment. It watches your files for changes and automatically restarts your script, just like `nodemon`.
 
 ### Running a script
+
 ```bash
 npx termilog src/server.js
 ```
 
 ### Watching a different file
+
 ```bash
 npx termilog app.js
 ```
 
+### Using a custom port
+
+```bash
+npx termilog --port 6000
+# or
+npx termilog app.js -p 6000
+```
+
 The CLI automatically:
-1.  **Starts the Bridge Server** (Port 5000) for browser logs.
+
+1.  **Starts the Bridge Server** (Default Port 5000) for browser logs.
 2.  **Watches files** and restarts your script on change.
 3.  **Cleanups processes** on exit.
 
@@ -73,6 +84,7 @@ log.error("Database connection failed");
 To see browser logs in your terminal, you need to use the **Bridge Adapter**.
 
 **Step A: Start the Bridge Server**
+
 - **Option 1 (Recommended):** Just run `npx termilog` (or `npx termilog dev.js`) in your terminal. It starts the bridge server automatically!
 - **Option 2 (Manual):** If you are not using the CLI, start it in your own script:
 
@@ -80,8 +92,8 @@ To see browser logs in your terminal, you need to use the **Bridge Adapter**.
 // scripts/dev-server.js
 import { startBridge } from "termilog-js/bridge";
 
-// Starts the log receiver on port 5000
-startBridge(5000); 
+// Starts the log receiver on a custom port (e.g., 6000)
+startBridge(6000);
 ```
 
 **Step B: Configure the Logger in your App**
@@ -90,8 +102,8 @@ startBridge(5000);
 // src/utils/logger.js
 import { Logger, createBrowserAdapter } from "termilog-js";
 
-// Connects to the bridge server running on localhost:5000
-const log = new Logger(createBrowserAdapter({ port: 5000 }));
+// Connects to the bridge server running on localhost:6000
+const log = new Logger(createBrowserAdapter({ port: 6000 }));
 
 export default log;
 ```
@@ -99,7 +111,7 @@ export default log;
 **Step C: Log from your Component**
 
 ```javascript
-import log from './utils/logger';
+import log from "./utils/logger";
 
 function App() {
   const handleClick = () => {
@@ -114,6 +126,7 @@ function App() {
 Termilog can act as a **central log server**. You can run `npx termilog` in one terminal, and have multiple apps (Frontend OR Backend) pipe logs to it.
 
 **Terminal 1 (Listener)**
+
 ```bash
 npx termilog
 # Starts bridge server on port 5000 and waits for logs...
@@ -157,10 +170,7 @@ You can combine adapters to pipe logs to multiple destinations simultaneously (e
 ```javascript
 import { Logger, nodeAdapter, createFileAdapter } from "termilog-js";
 
-const log = new Logger([
-  nodeAdapter,
-  createFileAdapter("debug.log")
-]);
+const log = new Logger([nodeAdapter, createFileAdapter("debug.log")]);
 
 log.error("This goes to stdout AND debug.log");
 ```
