@@ -18,14 +18,33 @@ Now features a built-in **Development CLI** with auto-restart capabilities (proc
 - **⚡ Zero-Config CLI**: New `termilog` command to run and watch your scripts (Hot Reload).
 - **Flexible Adapters**: Built-in support for Console, File, and Bridge adapters.
 - **Lightweight**: Minimal dependencies, focused on performance.
+- **Isomorphic**: Works out-of-the-box in Browsers (React, Vue, etc.) and Node.js.
+
+---
+
+## 🏗️ Framework Compatibility
+
+Termilog is designed to be **Universal**. Here is how it behaves in different environments:
+
+| Environment       | Mode                  | Supported Adapters                                 | Notes                                          |
+| :---------------- | :-------------------- | :------------------------------------------------- | :--------------------------------------------- |
+| **Browsers**      | React, Vue, Next.js   | `browserAdapter`, `remoteAdapter`, `nodeAdapter`\* | \*`nodeAdapter` uses `console.log` in browser. |
+| **Node.js**       | Express, Fastify, CLI | `nodeAdapter`, `remoteAdapter`, `fileAdapter`      | Full access to file system and terminal.       |
+| **Next.js (SSR)** | Edge / Serverless     | `nodeAdapter`, `remoteAdapter`                     | Works in API routes and `getServerSideProps`.  |
+
+Termilog automatically detects the environment and safely falls back or skips adapters that aren't compatible (e.g., `fileAdapter` is a silent no-op in the browser).
 
 ---
 
 ## 🚀 Installation
 
 ```bash
-npm install termilog-js
-# or globally for the CLI
+# Recommended: Install as a dev dependency
+npm install --save-dev termilog-js
+# or
+npm install -D termilog-js
+
+# Global installation for standalone binary
 npm install -g termilog-js
 ```
 

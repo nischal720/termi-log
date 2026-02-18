@@ -1,32 +1,32 @@
-import http from 'http';
+export default function createRemoteAdapter(options = {}) {
+  const config =
+    typeof options === "number"
+      ? { port: options }
+      : typeof options === "string"
+        ? { host: options }
+        : options;
 
-export default function createRemoteAdapter(
+  const {
     port = 5000,
-    host = 'localhost'
-) {
-    return {
-        write(entry) {
-            const data = JSON.stringify(entry);
+    host = "localhost",
+    protocol = "http",
+    path = "/__termi_log__",
+  } = config;
 
-            const req = http.request({
-                hostname: host,
-                port: port,
-                path: '/__termi_log__',
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': Buffer.byteLength(data)
-                }
-            });
+  const url = config.url || `${protocol}://${host}:${port}${path}`;
 
-            req.on('error', (error) => {
-                // Silently fail if bridge is down? Or fallback to console?
-                // Ideally silent to avoid crashing the app if logger is down.
-                // Maybe a tiny debug log to stderr if users are debugging the logger itself.
-            });
-
-            req.write(data);
-            req.end();
-        }
-    };
+  return {
+    write(entry) {
+      // Use global fetch (built-in in browsers and Node 18+)
+      if (typeof fetch === "function") {
+        fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(entry),
+        }).catch(() => {
+          // Silently fail if bridge is down
+        });
+      }
+    },
+  };
 }

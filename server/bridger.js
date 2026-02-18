@@ -1,16 +1,36 @@
-import express from "express";
+import http from "http";
 import nodeAdapter from "../src/adapters/nodeAdapter.js";
 
-const app = express();
-app.use(express.json());
-
 export function startBridge(port = 5000) {
-  app.post("/__termi_log__", (req, res) => {
-    nodeAdapter.write(req.body);
-    res.sendStatus(204);
+  const server = http.createServer((req, res) => {
+    // Only handle POST /__termi_log__
+    if (req.method === "POST" && req.url === "/__termi_log__") {
+      let body = "";
+
+      req.on("data", (chunk) => {
+        body += chunk.toString();
+      });
+
+      req.on("end", () => {
+        try {
+          const entry = JSON.parse(body);
+          nodeAdapter.write(entry);
+          res.statusCode = 204;
+          res.end();
+        } catch (e) {
+          res.statusCode = 400;
+          res.end("Invalid JSON");
+        }
+      });
+    } else {
+      res.statusCode = 404;
+      res.end("Not Found");
+    }
   });
 
-  app.listen(port, () => {
-    console.log(`Termilog bridge running on port ${port}`);
+  server.listen(port, () => {
+    console.log(`[Termilog] Bridge server running on port ${port}`);
   });
+
+  return server;
 }
