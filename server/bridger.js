@@ -3,6 +3,18 @@ import nodeAdapter from "../src/adapters/nodeAdapter.js";
 
 export function startBridge(port = 5000) {
   const server = http.createServer((req, res) => {
+    // Enable CORS for all requests
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+    // Handle preflight requests
+    if (req.method === "OPTIONS") {
+      res.statusCode = 204;
+      res.end();
+      return;
+    }
+
     // Only handle POST /__termi_log__
     if (req.method === "POST" && req.url === "/__termi_log__") {
       let body = "";
