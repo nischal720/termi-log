@@ -11,6 +11,14 @@
     ".": "./src/index.js",
     "./bridge": "./server/bridger.js"
   },
+  "repository": {
+    "type": "git",
+    "url":"https://github.com/nischal720/termi-log.git"
+  },
+  "homepage": "https://github.com/nischal720/termi-log#readme",
+  "bugs": {
+    "url": "https://github.com/nischal720/termi-log/issues"
+  },
   "keywords": [
     "logger",
     "terminal",
