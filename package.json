@@ -1,6 +1,6 @@
 {
   "name": "termilog-js",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Universal terminal logger for Node and frontend frameworks",
   "type": "module",
   "main": "./src/index.js",
