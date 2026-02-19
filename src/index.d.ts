@@ -9,6 +9,7 @@ export interface Adapter {
 }
 
 export interface LoggerConfig {
+  /** Minimum log level to output. Defaults to 'debug'. */
   level?: 'debug' | 'info' | 'warn' | 'error';
 }
 
@@ -18,6 +19,10 @@ export class Logger {
   info(message: any): void;
   warn(message: any): void;
   error(message: any): void;
+  /** Returns a shallow copy of the log history array. */
+  getHistory(): LogEntry[];
+  /** Clears the in-memory log history. */
+  clearHistory(): void;
 }
 
 export const nodeAdapter: Adapter;
@@ -28,6 +33,8 @@ export interface BrowserAdapterOptions {
   host?: string;
   protocol?: string;
   path?: string;
+  /** Called when the fetch request to the bridge fails. */
+  onError?: (err: Error, entry: LogEntry) => void;
 }
 
 export function createBrowserAdapter(options?: string | BrowserAdapterOptions): Adapter;
@@ -38,13 +45,17 @@ export interface RemoteAdapterOptions {
   host?: string;
   protocol?: string;
   path?: string;
+  /** Called when the fetch request to the bridge fails. */
+  onError?: (err: Error, entry: LogEntry) => void;
 }
 
 export function createRemoteAdapter(options?: number | string | RemoteAdapterOptions): Adapter;
 
 export function createFileAdapter(path?: string): Adapter;
 
-// Bridge server (from server/bridger.js but often imported via package root if exported)
-// Note: In package.json exports, "./bridge" maps to "./server/bridger.js"
-// Users importing from "termilog-js/bridge" will need a separate declaration or module augmentation
-// But ensuring the main entry has types is the priority.
+/**
+ * Starts the Termilog bridge HTTP server that receives logs from
+ * frontend/remote adapters and prints them to the terminal.
+ * @param port - Port to listen on. Defaults to 5000.
+ */
+export function startBridge(port?: number): import('http').Server;

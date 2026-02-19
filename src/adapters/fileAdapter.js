@@ -1,4 +1,16 @@
-export default function createFileAdapter(path = "server.log") {
+function formatMessage(message) {
+  if (message === null || message === undefined) return String(message);
+  if (typeof message === "object") {
+    try {
+      return JSON.stringify(message, null, 2);
+    } catch {
+      return String(message);
+    }
+  }
+  return String(message);
+}
+
+export default function createFileAdapter(filePath = "server.log") {
   let fsPromise = null;
 
   return {
@@ -15,8 +27,9 @@ export default function createFileAdapter(path = "server.log") {
 
         fsPromise
           .then((fs) => {
-            const line = `[${time}] [${type.toUpperCase()}]-> ${message}\n`;
-            fs.appendFileSync(path, line);
+            const formatted = formatMessage(message);
+            const line = `[${time}] [${type.toUpperCase()}] → ${formatted}\n`;
+            fs.appendFileSync(filePath, line);
           })
           .catch(() => {
             // Fail silently if fs cannot be imported or written to

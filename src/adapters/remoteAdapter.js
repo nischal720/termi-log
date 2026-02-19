@@ -11,6 +11,7 @@ export default function createRemoteAdapter(options = {}) {
     host = "localhost",
     protocol = "http",
     path = "/__termi_log__",
+    onError = null, // Optional: (err, entry) => void
   } = config;
 
   const url = config.url || `${protocol}://${host}:${port}${path}`;
@@ -23,8 +24,11 @@ export default function createRemoteAdapter(options = {}) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(entry),
-        }).catch(() => {
-          // Silently fail if bridge is down
+        }).catch((err) => {
+          if (typeof onError === "function") {
+            onError(err, entry);
+          }
+          // Silently fail by default if bridge is unreachable
         });
       }
     },

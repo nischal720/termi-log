@@ -16,7 +16,7 @@ export default class Logger {
     const entry = {
       time: new Date().toISOString(),
       type,
-      message, // ✅ fixed
+      message, // Objects stay as objects — adapters handle serialization
     };
 
     this.history.push(entry);
@@ -34,5 +34,15 @@ export default class Logger {
   }
   error(message) {
     this._emit("error", message);
+  }
+
+  /** Return log history (useful for testing or inspection) */
+  getHistory() {
+    return [...this.history];
+  }
+
+  /** Clear log history */
+  clearHistory() {
+    this.history = [];
   }
 }
