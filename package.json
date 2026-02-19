@@ -1,6 +1,6 @@
 {
   "name": "termilog-js",
-  "version": "1.1.0",
+  "version": "1.0.5",
   "description": "Universal terminal logger for Node.js and all frontend frameworks (React, Vue, Angular, Next.js, Nuxt, Vite, etc.)",
   "type": "module",
   "main": "./src/index.js",
@@ -21,7 +21,9 @@
   },
   "typesVersions": {
     "*": {
-      "bridge": ["./server/bridger.d.ts"]
+      "bridge": [
+        "./server/bridger.d.ts"
+      ]
     }
   },
   "repository": {
